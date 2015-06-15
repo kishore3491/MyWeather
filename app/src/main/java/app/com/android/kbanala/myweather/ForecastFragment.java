@@ -1,6 +1,7 @@
 package app.com.android.kbanala.myweather;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,8 +13,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,7 +52,7 @@ public class ForecastFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // List of String to be populated on Forecast Frame Layout of Fargment_Main Activity.
-        ArrayList<String> forecastData = new ArrayList<String>();
+        final ArrayList<String> forecastData = new ArrayList<String>();
         forecastData.add(0, "Today - Sunny - 88/63");
         forecastData.add(1, "Saturday - Sunny - 88/63");
         forecastData.add(2, "Sunday - Sunny - 88/63");
@@ -69,6 +72,16 @@ public class ForecastFragment extends Fragment {
 
         ListView listView = (ListView)rootview.findViewById(R.id.listview_forecast);
         listView.setAdapter(forecastDataAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+               Toast.makeText(getActivity(), forecastDataAdapter.getItem(position), Toast.LENGTH_SHORT).show();
+
+               Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT, forecastDataAdapter.getItem(position));
+                startActivity(intent);
+            }
+        });
 
         return rootview;
     }
@@ -126,8 +139,8 @@ public class ForecastFragment extends Fragment {
                 Uri uri = Uri.parse(BASE_URI).buildUpon()
                         .appendQueryParameter(QUERY_PARAM, params[0])
                         .appendQueryParameter(FORMAT_PARAM, outputFormat)
-                        .appendQueryParameter(UNITS_PARAM, metrics)
                         .appendQueryParameter(DAYS_PARAM, Integer.toString(NUM_OF_DAYS))
+                        .appendQueryParameter(UNITS_PARAM, metrics)
                         .build();
 
                 URL url = new URL(uri.toString());
